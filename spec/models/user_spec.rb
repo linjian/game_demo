@@ -3,7 +3,7 @@ require 'spec_helper'
 describe User do
   fixtures :users
 
-  before(:each) do
+  before :each do
     @user = users(:user1)
   end
 
@@ -18,6 +18,13 @@ describe User do
       }.should raise_error
 
       @user.cities.should have(City::MAXIMUM_PER_USER).records
+    end
+
+    it "should destroy cities if user has been destroyed" do
+      city_size = @user.cities.size
+      lambda {
+        @user.destroy
+      }.should change(City, :count).by(-city_size)
     end
   end
 end

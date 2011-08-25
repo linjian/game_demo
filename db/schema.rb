@@ -10,17 +10,17 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110825132601) do
+ActiveRecord::Schema.define(:version => 20110825151700) do
 
   create_table "cities", :force => true do |t|
-    t.integer  "user_id"
+    t.integer  "user_id",    :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "users", :force => true do |t|
-    t.string   "login"
-    t.string   "password"
+    t.string   "login",      :null => false
+    t.string   "password",   :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
