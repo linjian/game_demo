@@ -1,30 +1,37 @@
 require 'spec_helper'
 
 describe User do
+  include Rspec::GameDemo::CityHelper
+
   fixtures :users
 
-  before :each do
-    @user = users(:user1)
+  before(:each) do
+    @user = users(:user_1)
   end
 
-  context "has many cities" do
-    it "should have at most #{City::MAXIMUM_PER_USER} cities" do
-      (City::MAXIMUM_PER_USER - 1).times do
-        @user.cities.create
-      end
-
+  context "add city" do
+    it "should add a city successfully" do
       lambda {
-        @user.cities.create
-      }.should raise_error
-
-      @user.cities.should have(City::MAXIMUM_PER_USER).records
+        @user.add_city(:area_left_value => 100, :area_bottom_value => 0).should be_true
+      }.should change(City, :count).by(1)
     end
 
-    it "should destroy cities if user has been destroyed" do
-      city_size = @user.cities.size
+    it "should not add a city due to city count > #{User::MAXIMUM_CITY_COUNT}" do
+      create_max_cities(@user)
+
       lambda {
-        @user.destroy
-      }.should change(City, :count).by(-city_size)
+        @user.add_city(:area_left_value => User::MAXIMUM_CITY_COUNT * 100, :area_bottom_value => 0).should be_false
+      }.should_not change(City, :count)
+
+      @user.errors[:city].should_not be_blank
+    end
+
+    it "should not add a city due to city overlap with another one" do
+      lambda {
+        @user.add_city(:area_left_value => 20, :area_bottom_value => 20).should be_false
+      }.should_not change(City, :count)
+
+      @user.errors[:city].should_not be_blank
     end
   end
 end

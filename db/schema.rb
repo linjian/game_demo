@@ -10,12 +10,15 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110825151700) do
+ActiveRecord::Schema.define(:version => 20110826134222) do
 
   create_table "cities", :force => true do |t|
-    t.integer  "user_id",    :null => false
+    t.integer  "user_id",           :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "area_left_value",   :null => false
+    t.integer  "area_bottom_value", :null => false
+    t.string   "name"
   end
 
   create_table "users", :force => true do |t|

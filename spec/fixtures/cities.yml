@@ -1,2 +1,4 @@
-city1:
-  user: user1
+city_1:
+  user: user_1
+  area_left_value: 100
+  area_bottom_value: 100
