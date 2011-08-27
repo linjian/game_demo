@@ -174,6 +174,12 @@ class CityResource < ActiveRecord::Base
     end
   end
 
+  def change_tax_rate(new_rate)
+    with_tax_collection do
+      self.update_attributes(:tax_rate => new_rate) && new_rate
+    end
+  end
+
   def extract_hours_and_remainder(since)
     duration = (Time.now.utc - since).to_i
     past_hours = duration / 1.hour

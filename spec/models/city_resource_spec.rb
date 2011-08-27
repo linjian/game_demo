@@ -175,4 +175,24 @@ describe CityResource do
       @city_resource.get_population.should_not be_nil
     end
   end
+
+  context "change tax rate" do
+    before(:each) do
+      @city_resource.should_receive(:collect_tax).exactly(1)
+    end
+
+    it "should collect tax first" do
+      @city_resource.change_tax_rate(30).should == 30
+      @city_resource.reload
+      @city_resource.tax_rate.should == 30
+    end
+
+    it "should not change tax rate to invalid value" do
+      old_tax_rate = @city_resource.tax_rate
+      @city_resource.change_tax_rate(-1).should be_false
+      @city_resource.reload
+      @city_resource.tax_rate.should == old_tax_rate
+      @city_resource.errors[:tax_rate].should_not be_empty
+    end
+  end
 end
