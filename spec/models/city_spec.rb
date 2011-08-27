@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe City do
-  include Rspec::GameDemo::CityHelper
+  include Rspec::GameDemo::CitySpecHelper
 
   fixtures :cities
 

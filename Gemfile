@@ -7,7 +7,8 @@ gem 'mysql', '2.8.1'
 gem 'ruby-debug', '0.10.4'
 
 group :test do
-  gem 'rspec', '2.6.0'
-  gem 'rspec-rails', '2.6.1'
+  gem 'rspec',        '2.6.0'
+  gem 'rspec-rails',  '2.6.1'
   gem 'factory_girl', '2.0.5'
+  gem 'timecop',      '0.3.5'
 end
