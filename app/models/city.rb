@@ -3,6 +3,8 @@ class City < ActiveRecord::Base
 
   belongs_to :user
 
+  has_one :city_resource, :dependent => :destroy
+
   validates_numericality_of :area_left_value,
     :only_integer             => true,
     :greater_than_or_equal_to => 0
@@ -12,8 +14,14 @@ class City < ActiveRecord::Base
 
   validate :check_overlap
 
+  before_create :init_city_resource
+
   def check_overlap
     errors.add(:base, "overlaped with other cities") if overlap?
+  end
+
+  def init_city_resource
+    self.build_city_resource
   end
 
   def area_right_value

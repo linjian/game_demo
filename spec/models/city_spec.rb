@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe City do
+  include Rspec::GameDemo::CityHelper
+
   fixtures :cities
 
   before(:each) do
@@ -72,5 +74,12 @@ describe City do
       @new_city.attributes = {:area_left_value => 200, :area_bottom_value => 70}
       @new_city.should_not be_overlap
     end
+  end
+
+  it "should create city resource" do
+    lambda {
+      city = create_city(@user)
+      city.should_not be_new_record
+    }.should change(CityResource, :count).by(1)
   end
 end

@@ -1,0 +1,7 @@
+city_resource_1:
+  city: city_1
+  user: user_1
+  food: 0
+  gold: 0
+  population: 100
+  tax_rate: 20

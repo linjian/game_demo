@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110826134222) do
+ActiveRecord::Schema.define(:version => 20110827023313) do
 
   create_table "cities", :force => true do |t|
     t.integer  "user_id",           :null => false
@@ -19,6 +19,19 @@ ActiveRecord::Schema.define(:version => 20110826134222) do
     t.integer  "area_left_value",   :null => false
     t.integer  "area_bottom_value", :null => false
     t.string   "name"
+  end
+
+  create_table "city_resources", :force => true do |t|
+    t.integer  "city_id",                             :null => false
+    t.integer  "user_id",                             :null => false
+    t.integer  "food",               :default => 0,   :null => false
+    t.integer  "gold",               :default => 0,   :null => false
+    t.integer  "population",         :default => 100, :null => false
+    t.integer  "tax_rate",           :default => 20,  :null => false
+    t.datetime "last_taxation_time"
+    t.datetime "food_updated_time"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "users", :force => true do |t|
