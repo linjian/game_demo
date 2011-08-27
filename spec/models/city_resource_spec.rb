@@ -153,4 +153,26 @@ describe CityResource do
       @city_resource.population.should == 29000
     end
   end
+
+  context "get resource" do
+    before(:each) do
+      @city_resource.should_receive(:collect_tax).exactly(1)
+    end
+
+    it "should get resource" do
+      resource = @city_resource.get_resource
+      resource[:food].should_not be_nil
+      resource[:gold].should_not be_nil
+      resource[:population].should_not be_nil
+      resource[:tax_rate].should_not be_nil
+    end
+
+    it "should get gold" do
+      @city_resource.get_gold.should_not be_nil
+    end
+
+    it "should get population" do
+      @city_resource.get_population.should_not be_nil
+    end
+  end
 end

@@ -44,4 +44,8 @@ class City < ActiveRecord::Base
         self.area_bottom_value > city.area_top_value)
     end
   end
+
+  def get_current_city_resource
+    city_resource.get_resource
+  end
 end

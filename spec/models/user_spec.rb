@@ -34,4 +34,10 @@ describe User do
       @user.errors[:city].should_not be_blank
     end
   end
+
+  it "should get all current city resources" do
+    all_resources = @user.get_all_current_city_resources
+    all_resources.should have(1).item
+    all_resources[@user.cities.first.id.to_s].should_not be_empty
+  end
 end

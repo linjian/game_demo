@@ -18,4 +18,10 @@ class User < ActiveRecord::Base
     errors.add(:city, "can only be at most #{MAXIMUM_CITY_COUNT}") if hit_max
     !hit_max
   end
+
+  def get_all_current_city_resources
+    cities.inject({}) do |resources, city|
+      resources.merge(city.id.to_s => city.get_current_city_resource)
+    end
+  end
 end

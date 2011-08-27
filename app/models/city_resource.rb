@@ -146,6 +146,34 @@ class CityResource < ActiveRecord::Base
     self.population - delta
   end
 
+  def with_tax_collection
+    collect_tax
+    yield
+  end
+
+  def get_resource
+    with_tax_collection do
+      resource = {}
+      resource[:food] = self.get_food
+      resource[:gold] = self.gold
+      resource[:population] = self.population
+      resource[:tax_rate] = self.tax_rate
+      resource
+    end
+  end
+
+  def get_gold
+    with_tax_collection do
+      self.gold
+    end
+  end
+
+  def get_population
+    with_tax_collection do
+      self.population
+    end
+  end
+
   def extract_hours_and_remainder(since)
     duration = (Time.now.utc - since).to_i
     past_hours = duration / 1.hour
