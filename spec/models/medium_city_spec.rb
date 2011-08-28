@@ -248,4 +248,37 @@ describe MediumCity do
       end
     end
   end
+
+  context "adjust army training queues by population" do
+    before(:each) do
+      2.times { create_waiting_queue(@medium_city) }
+    end
+
+    it "should decrease amount of last queue" do
+      @medium_city.city_resource.update_attributes(:population => 8)
+      @medium_city.adjust_army_training_queues_by_population
+
+      @medium_city.reload
+      @medium_city.waiting_training_queues.last.amount.should == 2
+    end
+
+    it "should destroy last queue and decrease amount of second last queue" do
+      @medium_city.city_resource.update_attributes(:population => 5)
+
+      lambda {
+        @medium_city.adjust_army_training_queues_by_population
+      }.should change(ArmyTrainingQueue, :count).by(-1)
+
+      @medium_city.reload
+      @medium_city.waiting_training_queues.last.amount.should == 4
+    end
+
+    it "should decrease all waiting queues" do
+      @medium_city.city_resource.update_attributes(:population => 0)
+
+      lambda {
+        @medium_city.adjust_army_training_queues_by_population
+      }.should change(ArmyTrainingQueue, :count).by(-3)
+    end
+  end
 end

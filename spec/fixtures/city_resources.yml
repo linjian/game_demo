@@ -6,7 +6,7 @@ city_resource_1:
   population: 100
   tax_rate: 20
 
-city_resource_2:
+medium_city_resource:
   city: medium_city
   user: user_1
   food: 0

@@ -3,8 +3,8 @@ class ArmyTrainingQueue < ActiveRecord::Base
   belongs_to :medium_city, :foreign_key => "city_id"
 
   validates_numericality_of :amount,
-    :only_integer             => true,
-    :greater_than_or_equal_to => 0
+    :only_integer => true,
+    :greater_than => 0
 
   validate :check_population
 

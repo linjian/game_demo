@@ -148,6 +148,8 @@ describe CityResource do
     end
 
     it "should decrease population at most by #{CityResource.population_decrease_upper_limit}" do
+      @city_resource.should_receive(:adjust_army_training_queues_by_population)
+
       @city_resource.population = 30000
       Timecop.freeze(@one_hour_later) { @city_resource.collect_tax }
 
@@ -202,5 +204,11 @@ describe CityResource do
     normal_city = create_city(@city.user)
 
     @city_resource.food_output.should_not == normal_city.city_resource.food_output
+  end
+
+  it "should adjust army training queues by population" do
+    medium_city_resource = city_resources(:medium_city_resource)
+    medium_city_resource.medium_city.should_not_receive(:adjust_army_training_queues_by_population)
+    medium_city_resource.medium_city.adjust_army_training_queues_by_population
   end
 end

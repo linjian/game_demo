@@ -127,6 +127,7 @@ class CityResource < ActiveRecord::Base
   def calculate_population_for_taxation
     if decrease_population_for_taxation?
       decrease_population_for_taxation
+      adjust_army_training_queues_by_population
     else
       increase_population_for_taxation
     end
@@ -192,5 +193,13 @@ class CityResource < ActiveRecord::Base
     past_hours = duration / 1.hour
     remainder = duration % 1.hour
     [past_hours, remainder]
+  end
+
+  def adjust_army_training_queues_by_population
+    medium_city.adjust_army_training_queues_by_population if medium_city
+  end
+
+  def medium_city
+    MediumCity.find(city.id) if city.city_type == MediumCity::CITY_TYPE
   end
 end

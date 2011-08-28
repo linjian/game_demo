@@ -96,4 +96,18 @@ class MediumCity < City
       queue.in_training? ? queue.finish_training(next_queue) : break
     end
   end
+
+  def adjust_army_training_queues_by_population
+    population = city_resource.population
+    waiting_training_queues.each do |queue|
+      if population > queue.amount
+        population -= queue.amount
+      elsif population > 0
+        queue.update_attribute(:amount, population)
+        population = 0
+      else
+        queue.destroy
+      end
+    end
+  end
 end
