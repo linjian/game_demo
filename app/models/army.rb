@@ -7,6 +7,18 @@ class Army < ActiveRecord::Base
     :greater_than_or_equal_to => 0
 
   class << self
+    def gold_cost
+      self.const_get(:GOLD_COST)
+    end
+
+    def training_duration
+      self.const_get(:TRAINING_DURATION)
+    end
+
+    def food_consumption
+      self.const_get(:FOOD_CONSUMPTION)
+    end
+
     # Set constants Army::Spearman::ARMY_TYPE etc.
     def const_missing(name)
       if name.to_s == 'ARMY_TYPE' && self.to_s =~ /^Army::/

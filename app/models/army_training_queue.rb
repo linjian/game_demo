@@ -21,4 +21,50 @@ class ArmyTrainingQueue < ActiveRecord::Base
   def not_enough_population?
     (medium_city.get_population - medium_city.waiting_training_population) < self.amount
   end
+
+  def training_spent_time
+    return unless in_training?
+    (Time.now.utc - start_training_time).to_i
+  end
+
+  def training_remain_time
+    return unless in_training?
+    training_duration - training_spent_time
+  end
+
+  def end_training_time
+    start_training_time + training_duration
+  end
+
+  def training_duration
+    Army.const_get(army_type.capitalize).training_duration
+  end
+
+  def finish?
+    training_remain_time <= 0
+  end
+
+  def finish_training(next_queue)
+    return unless self.finish?
+
+    add_amount_to_army_when_training
+    self.destroy
+    next_queue.into_training(self) if next_queue
+  end
+
+  def add_amount_to_army_when_training
+    army = medium_city.send(army_type.downcase)
+    army.amount += amount
+    army.save
+  end
+
+  def into_training(previous_queue)
+    return if self.in_training?
+
+    start_training_time = previous_queue ? previous_queue.end_training_time : Time.now.utc
+    self.update_attributes(:in_training => true, :start_training_time => start_training_time)
+
+    self.medium_city.city_resource.population -= self.amount
+    self.medium_city.city_resource.save
+  end
 end

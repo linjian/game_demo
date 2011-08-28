@@ -57,7 +57,7 @@ describe MediumCity do
 
   context "cancel army training queue" do
     before(:each) do
-      @queue = create_training_queue(@medium_city)
+      @queue = create_waiting_queue(@medium_city)
     end
 
     it "should cancel a queue successfully" do
@@ -74,6 +74,176 @@ describe MediumCity do
       }.should_not change(ArmyTrainingQueue, :count)
 
       @medium_city.errors[:army_training_queue].should_not be_blank
+    end
+  end
+
+  context "get army info" do
+    it "should get army info" do
+      create_in_training_queue(@medium_city)
+      @medium_city.should_receive(:do_training)
+
+      army_info = @medium_city.get_army_info
+      army_info[:trained_army].should have(3).items
+      army_info[:in_training].should_not be_empty
+      army_info[:waiting_training].should have(1).items
+    end
+
+    it "should get trained army info" do
+      trained_army_info = @medium_city.trained_army_info
+      trained_army_info[:spearman].should_not be_nil
+      trained_army_info[:archer].should_not be_nil
+      trained_army_info[:cavalry].should_not be_nil
+    end
+
+    it "no trained army" do
+      [:spearman, :archer, :cavalry].each {|army| @medium_city.stub!(army)}
+
+      trained_army_info = @medium_city.trained_army_info
+      trained_army_info[:spearman].should == 0
+      trained_army_info[:archer].should == 0
+      trained_army_info[:cavalry].should == 0
+    end
+
+    it "should get in training info" do
+      create_in_training_queue(@medium_city)
+
+      in_training_info = @medium_city.in_training_info
+      in_training_info[:army_type].should_not be_nil
+      in_training_info[:amount].should_not be_nil
+      in_training_info[:start_training_time].should_not be_nil
+      in_training_info[:training_spent_time].should_not be_nil
+      in_training_info[:training_remain_time].should_not be_nil
+    end
+
+    it "no in training info" do
+      @medium_city.in_training_info.should be_nil
+    end
+
+    it "should get waiting training info" do
+      waiting_training_info = @medium_city.waiting_training_info
+      waiting_training_info.should have(1).item
+      waiting_training_info.first[:army_type].should_not be_nil
+      waiting_training_info.first[:amount].should_not be_nil
+    end
+
+    it "no waiting training info" do
+      clean_waiting_queuqs(@medium_city)
+      @medium_city.reload
+
+      @medium_city.waiting_training_info.should be_empty
+    end
+  end
+
+  context "do training" do
+    before(:each) do
+      clean_waiting_queuqs(@medium_city)
+    end
+
+    it "no queue is waiting for training" do
+      lambda {
+        @medium_city.do_training
+      }.should_not change(ArmyTrainingQueue, :count)
+    end
+
+    context "one queue" do
+      it "one queue will be in training" do
+        waiting_queue = create_waiting_queue(@medium_city)
+        old_population = @medium_city.city_resource.population
+
+        @medium_city.do_training
+        waiting_queue.should be_in_training
+        waiting_queue.start_training_time.should_not be_nil
+
+        @medium_city.city_resource.reload
+        @medium_city.city_resource.population.should == old_population - waiting_queue.amount
+      end
+
+      it "one queue is in training" do
+        create_in_training_queue(@medium_city)
+
+        lambda {
+          @medium_city.do_training
+        }.should_not change(ArmyTrainingQueue, :count)
+      end
+
+      it "one queue is finished training and no more queue" do
+        in_training_queue = create_in_training_queue(@medium_city)
+        now = in_training_queue.start_training_time + 100.hours
+        old_amount = @medium_city.spearman.amount
+
+        Timecop.freeze(now) do
+          lambda {
+            @medium_city.do_training
+          }.should change(ArmyTrainingQueue, :count).by(-1)
+        end
+
+        @medium_city.spearman.reload
+        @medium_city.spearman.amount.should == old_amount + in_training_queue.amount
+      end
+    end
+
+    context "two queues" do
+      before(:each) do
+        @in_training_queue = create_in_training_queue(@medium_city)
+        @waiting_queue = create_waiting_queue(@medium_city)
+      end
+
+      it "one queue is in training and one more queue" do
+        lambda {
+          @medium_city.do_training
+        }.should_not change(ArmyTrainingQueue, :count)
+      end
+
+      it "one queue is finished training and one more queue will be in training" do
+        now = @in_training_queue.start_training_time + 4.minutes
+        Timecop.freeze(now) do
+          lambda {
+            @medium_city.do_training
+          }.should change(ArmyTrainingQueue, :count).by(-1)
+        end
+
+        @waiting_queue.should be_in_training
+      end
+
+      it "two queues are all finished training" do
+        now = @in_training_queue.start_training_time + 100.hours
+        Timecop.freeze(now) do
+          lambda {
+            @medium_city.do_training
+          }.should change(ArmyTrainingQueue, :count).by(-2)
+        end
+      end
+    end
+
+    context "three queues" do
+      before(:each) do
+        @in_training_queue = create_in_training_queue(@medium_city)
+        @waiting_queue_1 = create_waiting_queue(@medium_city)
+        @waiting_queue_2 = create_waiting_queue(@medium_city)
+      end
+
+      it "one queue is finished training and two more queues will be in training" do
+        now = @in_training_queue.start_training_time + 5.minutes
+        Timecop.freeze(now) do
+          lambda {
+            @medium_city.do_training
+          }.should change(ArmyTrainingQueue, :count).by(-1)
+        end
+
+        @waiting_queue_1.should be_in_training
+        @waiting_queue_2.should_not be_in_training
+      end
+
+      it "two queues are all finished training and one more queues will be in training" do
+        now = @in_training_queue.start_training_time + 8.minutes
+        Timecop.freeze(now) do
+          lambda {
+            @medium_city.do_training
+          }.should change(ArmyTrainingQueue, :count).by(-2)
+        end
+
+        @waiting_queue_2.should be_in_training
+      end
     end
   end
 end

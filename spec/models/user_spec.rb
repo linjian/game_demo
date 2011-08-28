@@ -42,4 +42,10 @@ describe User do
     all_resources.should have(2).item
     all_resources[@user.cities.first.id.to_s].should_not be_empty
   end
+
+  it "should get all army info" do
+    army_info = @user.get_all_army_info
+    army_info.should have(1).item
+    army_info[@user.medium_cities.first.id.to_s].should_not be_empty
+  end
 end

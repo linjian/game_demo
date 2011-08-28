@@ -26,4 +26,46 @@ describe Army do
       @cavalry.specialize.should be_instance_of(Army::Cavalry)
     end
   end
+
+  context "gold cost" do
+    it "spearman" do
+      Army::Spearman.gold_cost.should_not be_nil
+    end
+
+    it "archer" do
+      Army::Archer.gold_cost.should_not be_nil
+    end
+
+    it "cavalry" do
+      Army::Cavalry.gold_cost.should_not be_nil
+    end
+  end
+
+  context "training duration" do
+    it "spearman" do
+      Army::Spearman.training_duration.should_not be_nil
+    end
+
+    it "archer" do
+      Army::Archer.training_duration.should_not be_nil
+    end
+
+    it "cavalry" do
+      Army::Cavalry.training_duration.should_not be_nil
+    end
+  end
+
+  context "food consumption" do
+    it "spearman" do
+      Army::Spearman.food_consumption.should_not be_nil
+    end
+
+    it "archer" do
+      Army::Archer.food_consumption.should_not be_nil
+    end
+
+    it "cavalry" do
+      Army::Cavalry.food_consumption.should_not be_nil
+    end
+  end
 end
