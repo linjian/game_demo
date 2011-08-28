@@ -50,4 +50,18 @@ class City < ActiveRecord::Base
   def get_current_city_resource
     city_resource.get_resource
   end
+
+  def become_capital
+    capital_sibling = get_capital_sibling
+
+    capital_sibling.city_resource.update_food if capital_sibling
+    self.city_resource.update_food
+
+    capital_sibling.update_attributes(:is_capital => false) if capital_sibling
+    self.update_attributes(:is_capital => true)
+  end
+
+  def get_capital_sibling
+    self.user.cities.detect(&:is_capital)
+  end
 end

@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe CityResource do
+  include Rspec::GameDemo::CitySpecHelper
   include Rspec::GameDemo::CityResourceSpecHelper
 
   fixtures :cities
@@ -49,7 +50,7 @@ describe CityResource do
 
   context "get food" do
     before(:each) do
-      CityResource.stub!(:food_output).and_return(1000)
+      @city_resource.stub!(:food_output).and_return(1000)
     end
 
     it "food_updated_time is nil and less than 1 hour since city created" do
@@ -194,5 +195,12 @@ describe CityResource do
       @city_resource.tax_rate.should == old_tax_rate
       @city_resource.errors[:tax_rate].should_not be_empty
     end
+  end
+
+  it "food output of capital should be different from normal city's" do
+    @city_resource.city.is_capital = true
+    normal_city = create_city(@city.user)
+
+    @city_resource.food_output.should_not == normal_city.city_resource.food_output
   end
 end

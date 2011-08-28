@@ -10,6 +10,12 @@ module Rspec
       def create_city(user)
         City.create(:user_id => user.id, :area_left_value => 110, :area_bottom_value => 0)
       end
+
+      def create_capital(user)
+        capital = create_city(user)
+        capital.update_attributes(:is_capital => true)
+        capital
+      end
     end
   end
 end

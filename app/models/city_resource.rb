@@ -1,7 +1,9 @@
 class CityResource < ActiveRecord::Base
   DEFAULT_POPULATION = 100
   DEFAULT_TAX_RATE = 20
-  NORMAL_FOOD_OUTPUT = 1000 # per hour
+
+  NORMAL_FOOD_OUTPUT  = 1000  # per hour
+  CAPITAL_FOOD_OUTPUT = 10000 # per hour
 
   POPULATION_INCREASE_LOWER_LIMIT = 1
   POPULATION_DECREASE_LOWER_LIMIT = 1
@@ -32,10 +34,6 @@ class CityResource < ActiveRecord::Base
   after_create :collect_tax
 
   class << self
-    def food_output
-      NORMAL_FOOD_OUTPUT
-    end
-
     def population_increase_lower_limit
       POPULATION_INCREASE_LOWER_LIMIT
     end
@@ -61,6 +59,10 @@ class CityResource < ActiveRecord::Base
     end
   end
 
+  def food_output
+    city.is_capital? ? CAPITAL_FOOD_OUTPUT : NORMAL_FOOD_OUTPUT
+  end
+
   def set_user_id
     self.user_id = city.user.id
   end
@@ -75,12 +77,17 @@ class CityResource < ActiveRecord::Base
   def get_food
     past_hours, remainder = extract_hours_and_remainder(last_food_updated_time)
     set_food_by_hours(past_hours)
-    self.food + remainder * self.class.food_output / 1.hour
+    self.food + remainder * self.food_output / 1.hour
+  end
+
+  def update_food
+    past_hours = extract_hours_and_remainder(last_food_updated_time).first
+    set_food_by_hours(past_hours)
   end
 
   def set_food_by_hours(past_hours)
     if past_hours > 0
-      self.food += past_hours * self.class.food_output
+      self.food += past_hours * self.food_output
       self.food_updated_time = last_food_updated_time + past_hours.hours
       self.save
     end

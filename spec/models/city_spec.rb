@@ -82,4 +82,41 @@ describe City do
       city.should_not be_new_record
     }.should change(CityResource, :count).by(1)
   end
+
+  context "change capital" do
+    it "should become capital" do
+      @city.become_capital.should be_true
+      @city.is_capital.should be_true
+    end
+
+    it "old capital should change to be normal city" do
+      old_capital = create_capital(@user)
+
+      @city.become_capital
+      @city.is_capital.should be_true
+      old_capital.reload
+      old_capital.is_capital.should be_false
+    end
+
+    it "should update food before becoming capital" do
+      created_at = @city.city_resource.created_at
+      now = created_at + 1.hour + 15.minutes + 3.seconds
+      Timecop.freeze(now) { @city.become_capital }
+
+      @city.city_resource.last_food_updated_time.should == created_at + 1.hour
+    end
+
+    it "should update food before old capital change to be normal city" do
+      created_at = @city.city_resource.created_at
+
+      old_capital = create_capital(@user)
+      old_capital.city_resource.update_attributes(:food_updated_time => created_at)
+
+      now = created_at + 1.hour + 15.minutes + 3.seconds
+      Timecop.freeze(now) { @city.become_capital }
+
+      old_capital.reload
+      old_capital.city_resource.last_food_updated_time.should == created_at + 1.hour
+    end
+  end
 end
