@@ -119,4 +119,10 @@ describe City do
       old_capital.city_resource.last_food_updated_time.should == created_at + 1.hour
     end
   end
+
+  it "should become medium city" do
+    medium_city = @city.become_medium_city
+    medium_city.should be_instance_of(MediumCity)
+    medium_city.city_type.should == MediumCity::CITY_TYPE
+  end
 end

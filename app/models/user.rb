@@ -2,7 +2,6 @@ class User < ActiveRecord::Base
   MAXIMUM_CITY_COUNT = 10
 
   has_many :cities, :dependent => :destroy
-  has_many :city_resources
 
   validates_presence_of :login, :password
 

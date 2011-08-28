@@ -64,4 +64,9 @@ class City < ActiveRecord::Base
   def get_capital_sibling
     self.user.cities.detect(&:is_capital)
   end
+
+  def become_medium_city
+    self.update_attributes(:city_type => MediumCity::CITY_TYPE)
+    MediumCity.find(self.id)
+  end
 end

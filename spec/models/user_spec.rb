@@ -4,6 +4,7 @@ describe User do
   include Rspec::GameDemo::CitySpecHelper
 
   fixtures :users
+  fixtures :city_resources
 
   before(:each) do
     @user = users(:user_1)
@@ -37,7 +38,7 @@ describe User do
 
   it "should get all current city resources" do
     all_resources = @user.get_all_current_city_resources
-    all_resources.should have(1).item
+    all_resources.should have(2).item
     all_resources[@user.cities.first.id.to_s].should_not be_empty
   end
 end

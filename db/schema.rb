@@ -10,7 +10,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110827182244) do
+ActiveRecord::Schema.define(:version => 20110828074818) do
+
+  create_table "armies", :force => true do |t|
+    t.integer  "city_id",                   :null => false
+    t.integer  "user_id",                   :null => false
+    t.string   "army_type",                 :null => false
+    t.integer  "amount",     :default => 0, :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "cities", :force => true do |t|
     t.integer  "user_id",           :null => false
@@ -20,6 +29,7 @@ ActiveRecord::Schema.define(:version => 20110827182244) do
     t.integer  "area_bottom_value", :null => false
     t.string   "name"
     t.boolean  "is_capital"
+    t.string   "city_type"
   end
 
   create_table "city_resources", :force => true do |t|

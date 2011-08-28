@@ -2,3 +2,9 @@ city_1:
   user: user_1
   area_left_value: 100
   area_bottom_value: 100
+
+medium_city:
+  user: user_1
+  area_left_value: 10000
+  area_bottom_value: 10000
+  city_type: MEDIUM
