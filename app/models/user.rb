@@ -9,12 +9,12 @@ class User < ActiveRecord::Base
     return false unless check_city_count
     new_city = self.cities.create(city_attrs)
     errors.add(:city, new_city.errors.full_messages.join(". ")) if new_city.invalid?
-    new_city.valid?
+    new_city.valid? ? new_city : false
   end
 
   def check_city_count
     hit_max = (cities.size >= MAXIMUM_CITY_COUNT)
-    errors.add(:city, "can only be at most #{MAXIMUM_CITY_COUNT}") if hit_max
+    errors.add(:city, "can only have at most #{MAXIMUM_CITY_COUNT}") if hit_max
     !hit_max
   end
 

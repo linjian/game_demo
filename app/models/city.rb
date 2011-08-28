@@ -17,6 +17,7 @@ class City < ActiveRecord::Base
   before_create :init_city_resource
 
   delegate :change_tax_rate, :to => :city_resource
+  delegate :get_population,  :to => :city_resource
 
   def check_overlap
     errors.add(:base, "overlaped with other cities") if overlap?

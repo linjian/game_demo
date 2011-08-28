@@ -10,13 +10,24 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110828074818) do
+ActiveRecord::Schema.define(:version => 20110828090801) do
 
   create_table "armies", :force => true do |t|
     t.integer  "city_id",                   :null => false
     t.integer  "user_id",                   :null => false
     t.string   "army_type",                 :null => false
     t.integer  "amount",     :default => 0, :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "army_training_queues", :force => true do |t|
+    t.integer  "city_id",                                :null => false
+    t.integer  "user_id",                                :null => false
+    t.string   "army_type",                              :null => false
+    t.integer  "amount",              :default => 0,     :null => false
+    t.boolean  "in_training",         :default => false, :null => false
+    t.datetime "start_training_time"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

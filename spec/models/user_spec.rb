@@ -13,7 +13,8 @@ describe User do
   context "add city" do
     it "should add a city successfully" do
       lambda {
-        @user.add_city(:area_left_value => 100, :area_bottom_value => 0).should be_true
+        new_city = @user.add_city(:area_left_value => 100, :area_bottom_value => 0)
+        new_city.should_not be_new_record
       }.should change(City, :count).by(1)
     end
 
