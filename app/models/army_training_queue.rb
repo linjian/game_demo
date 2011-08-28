@@ -37,7 +37,11 @@ class ArmyTrainingQueue < ActiveRecord::Base
   end
 
   def training_duration
-    Army.const_get(army_type.capitalize).training_duration
+    army_class.training_duration
+  end
+
+  def army_class
+    Army.const_get(army_type.capitalize)
   end
 
   def finish?
@@ -47,15 +51,22 @@ class ArmyTrainingQueue < ActiveRecord::Base
   def finish_training(next_queue)
     return unless self.finish?
 
-    add_amount_to_army_when_training
+    add_amount_to_army_for_training
+    cost_gold_for_training
     self.destroy
     next_queue.into_training(self) if next_queue
   end
 
-  def add_amount_to_army_when_training
+  def add_amount_to_army_for_training
     army = medium_city.send(army_type.downcase)
     army.amount += amount
     army.save
+  end
+
+  def cost_gold_for_training
+    self.medium_city.city_resource.reload
+    self.medium_city.city_resource.gold -= army_class.gold_cost
+    self.medium_city.city_resource.save
   end
 
   def into_training(previous_queue)

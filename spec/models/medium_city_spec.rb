@@ -170,6 +170,7 @@ describe MediumCity do
         in_training_queue = create_in_training_queue(@medium_city)
         now = in_training_queue.start_training_time + 100.hours
         old_amount = @medium_city.spearman.amount
+        @medium_city.city_resource.update_attributes(:gold => 20)
 
         Timecop.freeze(now) do
           lambda {
@@ -177,8 +178,9 @@ describe MediumCity do
           }.should change(ArmyTrainingQueue, :count).by(-1)
         end
 
-        @medium_city.spearman.reload
+        @medium_city.reload
         @medium_city.spearman.amount.should == old_amount + in_training_queue.amount
+        @medium_city.city_resource.gold.should == 19
       end
     end
 
