@@ -21,7 +21,8 @@ describe ArmyTrainingQueue do
 
   it "should get training remain time" do
     Timecop.freeze(@now) do
-      @in_training_queue.training_remain_time.should == Army::Spearman::TRAINING_DURATION - 1.minutes
+      @in_training_queue.training_remain_time.should ==
+        Army::Spearman::TRAINING_DURATION * @in_training_queue.amount - 1.minutes
     end
   end
 

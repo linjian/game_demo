@@ -29,15 +29,11 @@ class ArmyTrainingQueue < ActiveRecord::Base
 
   def training_remain_time
     return unless in_training?
-    training_duration - training_spent_time
+    total_training_duration - training_spent_time
   end
 
   def end_training_time
-    start_training_time + training_duration
-  end
-
-  def training_duration
-    army_class.training_duration
+    start_training_time + total_training_duration
   end
 
   def army_class
@@ -65,7 +61,7 @@ class ArmyTrainingQueue < ActiveRecord::Base
 
   def cost_gold_for_training
     self.medium_city.city_resource.reload
-    self.medium_city.city_resource.gold -= army_class.gold_cost
+    self.medium_city.city_resource.gold -= total_gold_cost
     self.medium_city.city_resource.save
   end
 
@@ -77,5 +73,13 @@ class ArmyTrainingQueue < ActiveRecord::Base
 
     self.medium_city.city_resource.population -= self.amount
     self.medium_city.city_resource.save
+  end
+
+  def total_gold_cost
+    army_class.gold_cost * amount
+  end
+
+  def total_training_duration
+    army_class.training_duration * amount
   end
 end

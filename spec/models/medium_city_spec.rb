@@ -180,7 +180,7 @@ describe MediumCity do
 
         @medium_city.reload
         @medium_city.spearman.amount.should == old_amount + in_training_queue.amount
-        @medium_city.city_resource.gold.should == 19
+        @medium_city.city_resource.gold.should == 15
       end
     end
 
@@ -197,7 +197,7 @@ describe MediumCity do
       end
 
       it "one queue is finished training and one more queue will be in training" do
-        now = @in_training_queue.start_training_time + 4.minutes
+        now = @in_training_queue.start_training_time + 20.minutes
         Timecop.freeze(now) do
           lambda {
             @medium_city.do_training
@@ -225,7 +225,7 @@ describe MediumCity do
       end
 
       it "one queue is finished training and two more queues will be in training" do
-        now = @in_training_queue.start_training_time + 5.minutes
+        now = @in_training_queue.start_training_time + 19.minutes
         Timecop.freeze(now) do
           lambda {
             @medium_city.do_training
@@ -237,7 +237,7 @@ describe MediumCity do
       end
 
       it "two queues are all finished training and one more queues will be in training" do
-        now = @in_training_queue.start_training_time + 8.minutes
+        now = @in_training_queue.start_training_time + 37.minutes
         Timecop.freeze(now) do
           lambda {
             @medium_city.do_training
