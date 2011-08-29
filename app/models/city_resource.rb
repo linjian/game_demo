@@ -1,6 +1,6 @@
 class CityResource < ActiveRecord::Base
   DEFAULT_POPULATION = 100
-  DEFAULT_TAX_RATE = 20
+  DEFAULT_TAX_RATE = 0.2
 
   NORMAL_FOOD_OUTPUT  = 1000  # per hour
   CAPITAL_FOOD_OUTPUT = 10000 # per hour
@@ -9,8 +9,8 @@ class CityResource < ActiveRecord::Base
   POPULATION_DECREASE_LOWER_LIMIT = 1
   POPULATION_INCREASE_UPPER_LIMIT = 1000
   POPULATION_DECREASE_UPPER_LIMIT = 1000
-  POPULATION_INCREASE_RATE = 5
-  POPULATION_DECREASE_RATE = 5
+  POPULATION_INCREASE_RATE = 0.05
+  POPULATION_DECREASE_RATE = 0.05
 
   belongs_to :user
   belongs_to :city
@@ -24,7 +24,6 @@ class CityResource < ActiveRecord::Base
     :only_integer             => true,
     :greater_than_or_equal_to => 0
   validates_numericality_of :tax_rate,
-    :only_integer             => true,
     :greater_than_or_equal_to => 0
 
   before_create :set_user_id
@@ -74,7 +73,7 @@ class CityResource < ActiveRecord::Base
     self.food ||= 0
     self.gold ||= 0
     self.population ||= 100
-    self.tax_rate ||= 20
+    self.tax_rate ||= 0.2
   end
 
   def update_food
@@ -114,7 +113,7 @@ class CityResource < ActiveRecord::Base
   end
 
   def decrease_gold_for_taxation
-    self.gold = (self.gold * (1 - tax_rate / 100.0)).to_i
+    self.gold = (self.gold * (1 - tax_rate)).to_i
   end
 
   def calculate_population_for_taxation
@@ -127,12 +126,12 @@ class CityResource < ActiveRecord::Base
   end
 
   def decrease_population_for_taxation?
-    self.population > tax_rate * 1000 / 100
+    self.population > tax_rate * 1000
   end
 
   [:increase, :decrease].each do |type|
     define_method :"#{type}_population_for_taxation" do
-      delta = (self.population * self.class.send(:"population_#{type}_rate") / 100.0)
+      delta = (self.population * self.class.send(:"population_#{type}_rate"))
       delta = [delta, self.class.send(:"population_#{type}_lower_limit")].max
       delta = [delta, self.class.send(:"population_#{type}_upper_limit")].min
       self.population = self.send(:"#{type}d_population", delta).to_i

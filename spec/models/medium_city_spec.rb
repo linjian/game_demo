@@ -96,7 +96,7 @@ describe MediumCity do
     end
 
     it "no trained army" do
-      [:spearman, :archer, :cavalry].each {|army| @medium_city.stub!(army)}
+      [:spearman, :archer, :cavalry].each {|army| @medium_city.stub(army)}
 
       trained_army_info = @medium_city.trained_army_info
       trained_army_info[:spearman].should == 0

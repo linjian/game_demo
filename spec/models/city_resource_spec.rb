@@ -23,7 +23,7 @@ describe CityResource do
     it "should set default values" do
       lambda {
         city_resource = @city.city_resource.build
-        city_resource.stub!(:collect_tax)
+        city_resource.stub(:collect_tax)
         city_resource.save
 
         city_resource.food.should == 0
@@ -34,10 +34,10 @@ describe CityResource do
     end
 
     it "should not replace by default values" do
-      attrs = {:food => 10, :gold => 20, :population => 30, :tax_rate => 40}
+      attrs = {:food => 10, :gold => 20, :population => 30, :tax_rate => 0.4}
       lambda {
         city_resource = @city.city_resource.build(attrs)
-        city_resource.stub!(:collect_tax)
+        city_resource.stub(:collect_tax)
         city_resource.save
 
         city_resource.food.should == attrs[:food]
@@ -49,7 +49,7 @@ describe CityResource do
   end
 
   it "should update food" do
-    @city_resource.stub!(:food_output).and_return(1000)
+    @city_resource.stub(:food_output).and_return(1000)
     now = @city_resource.created_at + 20.minutes + 7.seconds
 
     Timecop.freeze(now) do
@@ -96,7 +96,7 @@ describe CityResource do
 
     it "should increase population at most by #{CityResource.population_increase_upper_limit}" do
       @city_resource.population = 30000
-      @city_resource.tax_rate = 4000
+      @city_resource.tax_rate = 40
       Timecop.freeze(@one_hour_later) { @city_resource.collect_tax }
 
       @city_resource.population.should == 31000
@@ -104,7 +104,7 @@ describe CityResource do
 
     it "should decrease population at least by #{CityResource.population_decrease_lower_limit}" do
       @city_resource.population = 11
-      @city_resource.tax_rate = 1
+      @city_resource.tax_rate = 0.01
       Timecop.freeze(@one_hour_later) { @city_resource.collect_tax }
 
       @city_resource.population.should == 10
@@ -186,9 +186,9 @@ describe CityResource do
     end
 
     it "should collect tax first" do
-      @city_resource.change_tax_rate(30).should == 30
+      @city_resource.change_tax_rate(0.3).should == 0.3
       @city_resource.reload
-      @city_resource.tax_rate.should == 30
+      @city_resource.tax_rate.should == 0.3
     end
 
     it "should not change tax rate to invalid value" do

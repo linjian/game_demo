@@ -9,12 +9,12 @@ module Rspec
       end
 
       def stub_population_increase_and_decrease_config
-        CityResource.stub!(:population_increase_lower_limit).and_return(1)
-        CityResource.stub!(:population_decrease_lower_limit).and_return(1)
-        CityResource.stub!(:population_increase_upper_limit).and_return(1000)
-        CityResource.stub!(:population_decrease_upper_limit).and_return(1000)
-        CityResource.stub!(:population_increase_rate).and_return(5)
-        CityResource.stub!(:population_decrease_rate).and_return(5)
+        CityResource.stub(:population_increase_lower_limit).and_return(1)
+        CityResource.stub(:population_decrease_lower_limit).and_return(1)
+        CityResource.stub(:population_increase_upper_limit).and_return(1000)
+        CityResource.stub(:population_decrease_upper_limit).and_return(1000)
+        CityResource.stub(:population_increase_rate).and_return(0.05)
+        CityResource.stub(:population_decrease_rate).and_return(0.05)
       end
     end
   end

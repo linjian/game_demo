@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110829135904) do
+ActiveRecord::Schema.define(:version => 20110829185031) do
 
   create_table "armies", :force => true do |t|
     t.integer  "city_id",                            :null => false
@@ -51,7 +51,7 @@ ActiveRecord::Schema.define(:version => 20110829135904) do
     t.float    "food",               :default => 0.0, :null => false
     t.integer  "gold",               :default => 0,   :null => false
     t.integer  "population",         :default => 100, :null => false
-    t.integer  "tax_rate",           :default => 20,  :null => false
+    t.float    "tax_rate",           :default => 0.2, :null => false
     t.datetime "last_taxation_time"
     t.datetime "food_updated_time"
     t.datetime "created_at"
