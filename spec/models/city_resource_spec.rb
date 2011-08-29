@@ -48,51 +48,14 @@ describe CityResource do
     end
   end
 
-  context "get food" do
-    before(:each) do
-      @city_resource.stub!(:food_output).and_return(1000)
-    end
+  it "should update food" do
+    @city_resource.stub!(:food_output).and_return(1000)
+    now = @city_resource.created_at + 20.minutes + 7.seconds
 
-    it "food_updated_time is nil and less than 1 hour since city created" do
-      now = @city_resource.created_at + 20.minutes + 7.seconds
-
-      Timecop.freeze(now) do
-        @city_resource.get_food.should == 335
-        @city_resource.food.should == 0
-        @city_resource.food_updated_time.should be_nil
-      end
-    end
-
-    it "food_updated_time is nil and more than 1 hour since city created" do
-      now = @city_resource.created_at + 1.hour + 15.minutes + 3.seconds
-
-      Timecop.freeze(now) do
-        @city_resource.get_food.should == 1250
-        @city_resource.food.should == 1000
-        @city_resource.food_updated_time.should == @city_resource.created_at + 1.hour
-      end
-    end
-
-    it "food_updated_time exists and less than 1 hour since last update" do
-      update_food(@city_resource, 1)
-      now = @city_resource.created_at + 1.hour + 25.minutes + 5.seconds
-
-      Timecop.freeze(now) do
-        @city_resource.get_food.should == 1418
-        @city_resource.food.should == 1000
-        @city_resource.food_updated_time.should == @city_resource.created_at + 1.hour
-      end
-    end
-
-    it "food_updated_time exists and more than 2 hours since last update" do
-      update_food(@city_resource, 1)
-      now = @city_resource.created_at + 3.hours + 28.minutes + 9.seconds
-
-      Timecop.freeze(now) do
-        @city_resource.get_food.should == 3469
-        @city_resource.food.should == 3000
-        @city_resource.food_updated_time.should == @city_resource.created_at + 3.hours
-      end
+    Timecop.freeze(now) do
+      @city_resource.update_food.should == 335
+      @city_resource.food.should be_within(0.01).of(335.277777777778)
+      @city_resource.food_updated_time.should == now
     end
   end
 
@@ -154,6 +117,44 @@ describe CityResource do
       Timecop.freeze(@one_hour_later) { @city_resource.collect_tax }
 
       @city_resource.population.should == 29000
+    end
+  end
+
+  context "supply food while collecting tax" do
+    before(:each) do
+      @medium_city_resource = city_resources(:medium_city_resource)
+      @medium_city = @medium_city_resource.medium_city
+      update_armies_food(@medium_city, 10)
+    end
+
+    it "should subtract food for armies" do
+      @medium_city_resource.should_receive(:update_food).and_return(100)
+      @medium_city_resource.collect_tax
+
+      @medium_city_resource.food.should == 70
+      @medium_city.reload
+      @medium_city.armies.each {|army| army.food.should == 0}
+      @medium_city.armies.each {|army| army.amount.should == 1}
+    end
+
+    it "should encounter food crisis" do
+      @medium_city_resource.should_receive(:update_food).and_return(20)
+      update_armies_amount(@medium_city, 14)
+      @medium_city_resource.collect_tax
+
+      @medium_city_resource.food.should == 0
+      @medium_city.reload
+      @medium_city.armies.each {|army| army.food.should == 0}
+      @medium_city.armies.each {|army| army.amount.should == 12}
+    end
+
+    it "should decrease at least one of amount" do
+      @medium_city_resource.should_receive(:update_food).and_return(20)
+      update_armies_amount(@medium_city, 5)
+      @medium_city_resource.collect_tax
+
+      @medium_city.reload
+      @medium_city.armies.each {|army| army.amount.should == 4}
     end
   end
 

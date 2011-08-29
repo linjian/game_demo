@@ -16,7 +16,6 @@ class CityResource < ActiveRecord::Base
   belongs_to :city
 
   validates_numericality_of :food,
-    :only_integer             => true,
     :greater_than_or_equal_to => 0
   validates_numericality_of :gold,
     :only_integer             => true,
@@ -63,8 +62,12 @@ class CityResource < ActiveRecord::Base
     city.is_capital? ? CAPITAL_FOOD_OUTPUT : NORMAL_FOOD_OUTPUT
   end
 
+  def food_output_rate
+    food_output.to_f / 1.hour
+  end
+
   def set_user_id
-    self.user_id = city.user.id
+    self.user_id = city.user_id
   end
 
   def set_default_values
@@ -74,33 +77,22 @@ class CityResource < ActiveRecord::Base
     self.tax_rate ||= 20
   end
 
-  def get_food
-    past_hours, remainder = extract_hours_and_remainder(last_food_updated_time)
-    set_food_by_hours(past_hours)
-    self.food + remainder * self.food_output / 1.hour
-  end
-
   def update_food
-    past_hours = extract_hours_and_remainder(last_food_updated_time).first
-    set_food_by_hours(past_hours)
+    now = Time.now.utc
+    food = calculate_food(now)
+    self.update_attributes(:food => food, :food_updated_time => now)
+    self.food.to_i
   end
 
-  def set_food_by_hours(past_hours)
-    if past_hours > 0
-      self.food += past_hours * self.food_output
-      self.food_updated_time = last_food_updated_time + past_hours.hours
-      self.save
-    end
-  end
-
-  def last_food_updated_time
-    food_updated_time || created_at
+  def calculate_food(now)
+    duration = now - (food_updated_time || created_at)
+    duration * self.food_output_rate + self.food
   end
 
   def collect_tax
     init_last_taxation_time
 
-    past_hours = extract_hours_and_remainder(self.last_taxation_time).first
+    past_hours = (Time.now.utc - self.last_taxation_time).to_i / 1.hour
     past_hours.times { collect_tax_by_hour }
 
     self.save
@@ -111,6 +103,7 @@ class CityResource < ActiveRecord::Base
 
     decrease_gold_for_taxation
     calculate_population_for_taxation
+    supply_food_for_armies
     self.last_taxation_time += 1.hours
 
     self.save if save
@@ -162,7 +155,7 @@ class CityResource < ActiveRecord::Base
   def get_resource
     with_tax_collection do
       resource = {}
-      resource[:food] = self.get_food
+      resource[:food] = self.update_food
       resource[:gold] = self.gold
       resource[:population] = self.population
       resource[:tax_rate] = self.tax_rate
@@ -188,15 +181,22 @@ class CityResource < ActiveRecord::Base
     end
   end
 
-  def extract_hours_and_remainder(since)
-    duration = (Time.now.utc - since).to_i
-    past_hours = duration / 1.hour
-    remainder = duration % 1.hour
-    [past_hours, remainder]
+  def adjust_army_training_queues_by_population
+    medium_city = self.medium_city
+    medium_city.adjust_army_training_queues_by_population if medium_city
   end
 
-  def adjust_army_training_queues_by_population
-    medium_city.adjust_army_training_queues_by_population if medium_city
+  def supply_food_for_armies
+    return unless medium_city = self.medium_city
+
+    city_food = self.update_food
+    armies_food_consumption = medium_city.armies_food_consumption
+
+    delta = city_food - armies_food_consumption
+    self.update_attribute(:food, [delta, 0].max)
+    medium_city.decreased_armies_amount if delta < 0
+
+    medium_city.clean_food_consumption
   end
 
   def medium_city

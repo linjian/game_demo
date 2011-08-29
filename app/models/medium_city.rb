@@ -26,6 +26,22 @@ class MediumCity < City
     :dependent  => :destroy,
     :conditions => {:in_training => true}
 
+  def armies
+    [spearman, archer, cavalry].compact
+  end
+
+  def armies_food_consumption
+    armies.inject(0) {|sum, army| sum + army.get_food}
+  end
+
+  def clean_food_consumption
+    armies.each {|army| army.update_attribute(:food, 0)}
+  end
+
+  def decreased_armies_amount
+    armies.each {|army| army.update_attribute(:amount, army.amount * army.remain_rate)}
+  end
+
   def add_army_training_queue(queue_attrs)
     return false unless check_waiting_queue_count
     new_queue = self.army_training_queues.create(queue_attrs)

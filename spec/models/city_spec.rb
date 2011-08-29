@@ -103,7 +103,7 @@ describe City do
       now = created_at + 1.hour + 15.minutes + 3.seconds
       Timecop.freeze(now) { @city.become_capital }
 
-      @city.city_resource.last_food_updated_time.should == created_at + 1.hour
+      @city.city_resource.food_updated_time.should == now
     end
 
     it "should update food before old capital change to be normal city" do
@@ -116,7 +116,7 @@ describe City do
       Timecop.freeze(now) { @city.become_capital }
 
       old_capital.reload
-      old_capital.city_resource.last_food_updated_time.should == created_at + 1.hour
+      old_capital.city_resource.food_updated_time.should == now
     end
   end
 

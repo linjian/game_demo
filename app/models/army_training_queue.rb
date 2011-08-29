@@ -15,7 +15,7 @@ class ArmyTrainingQueue < ActiveRecord::Base
   end
 
   def set_user_id
-    self.user_id = medium_city.user.id
+    self.user_id = medium_city.user_id
   end
 
   def not_enough_population?
@@ -54,7 +54,8 @@ class ArmyTrainingQueue < ActiveRecord::Base
   end
 
   def add_amount_to_army_for_training
-    army = medium_city.send(army_type.downcase)
+    association = army_type.downcase
+    army = medium_city.send(association) || medium_city.send("create_#{association}")
     army.amount += amount
     army.save
   end

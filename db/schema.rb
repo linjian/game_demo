@@ -10,15 +10,17 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110828090801) do
+ActiveRecord::Schema.define(:version => 20110829135904) do
 
   create_table "armies", :force => true do |t|
-    t.integer  "city_id",                   :null => false
-    t.integer  "user_id",                   :null => false
-    t.string   "army_type",                 :null => false
-    t.integer  "amount",     :default => 0, :null => false
+    t.integer  "city_id",                            :null => false
+    t.integer  "user_id",                            :null => false
+    t.string   "army_type",                          :null => false
+    t.integer  "amount",            :default => 0,   :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.float    "food",              :default => 0.0, :null => false
+    t.datetime "food_updated_time"
   end
 
   create_table "army_training_queues", :force => true do |t|
@@ -46,7 +48,7 @@ ActiveRecord::Schema.define(:version => 20110828090801) do
   create_table "city_resources", :force => true do |t|
     t.integer  "city_id",                             :null => false
     t.integer  "user_id",                             :null => false
-    t.integer  "food",               :default => 0,   :null => false
+    t.float    "food",               :default => 0.0, :null => false
     t.integer  "gold",               :default => 0,   :null => false
     t.integer  "population",         :default => 100, :null => false
     t.integer  "tax_rate",           :default => 20,  :null => false

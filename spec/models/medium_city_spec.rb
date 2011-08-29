@@ -247,6 +247,21 @@ describe MediumCity do
         @waiting_queue_2.should be_in_training
       end
     end
+
+    it "should create army if not exists" do
+      @medium_city.spearman.destroy
+      in_training_queue = create_in_training_queue(@medium_city)
+      now = in_training_queue.start_training_time + 100.hours
+
+      Timecop.freeze(now) do
+        lambda {
+          @medium_city.do_training
+        }.should change(ArmyTrainingQueue, :count).by(-1)
+      end
+
+      @medium_city.reload
+      @medium_city.spearman.should be
+    end
   end
 
   context "adjust army training queues by population" do

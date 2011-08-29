@@ -16,6 +16,14 @@ module Rspec
         capital.update_attributes(:is_capital => true)
         capital
       end
+
+      def update_armies_food(city, food)
+        city.armies.each {|army| army.update_attribute(:food, food)}
+      end
+
+      def update_armies_amount(city, amount)
+        city.armies.each {|army| army.update_attribute(:amount, amount)}
+      end
     end
   end
 end
