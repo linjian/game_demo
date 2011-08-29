@@ -1,12 +1,12 @@
 class User < ActiveRecord::Base
-  MAXIMUM_CITY_COUNT = 10
-
   has_many :cities, :dependent => :destroy
   has_many :medium_cities, :dependent => :destroy,
     :foreign_key => "user_id",
-    :conditions  => {:city_type => MediumCity::CITY_TYPE}
+    :conditions  => {:city_type => MediumCity.medium_city_type}
 
   validates_presence_of :login, :password
+
+  config_class_methods :maximum_city_count
 
   def add_city(city_attrs)
     return false unless check_city_count
@@ -16,8 +16,8 @@ class User < ActiveRecord::Base
   end
 
   def check_city_count
-    hit_max = (cities.size >= MAXIMUM_CITY_COUNT)
-    errors.add(:city, "can only have at most #{MAXIMUM_CITY_COUNT}") if hit_max
+    hit_max = (cities.size >= self.class.maximum_city_count)
+    errors.add(:city, "can only have at most #{self.class.maximum_city_count}") if hit_max
     !hit_max
   end
 

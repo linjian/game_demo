@@ -36,7 +36,7 @@ describe MediumCity do
       }.should change(ArmyTrainingQueue, :count).by(1)
     end
 
-    it "should not add a queue if queue count > #{MediumCity::MAXIMUM_WAITING_TRAINING_QUEUE}" do
+    it "should not add a queue if queue count > #{MediumCity.maximum_waiting_training_queue}" do
       create_max_waiting_queues(@medium_city)
 
       lambda {

@@ -1,0 +1,34 @@
+archer:
+  gold_cost: 3
+  training_duration: 12
+  food_consumption: 13
+cavalry:
+  gold_cost: 10
+  training_duration: 50
+  food_consumption: 30
+spearman:
+  gold_cost: 1
+  training_duration: 3
+  food_consumption: 10
+
+army_turnover_rate: 0.1
+
+city_side_length: 100
+
+maximum_city_count: 10
+
+medium_city_type: MEDIUM
+maximum_waiting_training_queue: 5
+
+default_population: 100
+default_tax_rate: 0.2
+
+normal_food_output: 1000  # per hour
+capital_food_output: 10000 # per hour
+
+population_increase_lower_limit: 1
+population_decrease_lower_limit: 1
+population_increase_upper_limit: 1000
+population_decrease_upper_limit: 1000
+population_increase_rate: 0.05
+population_decrease_rate: 0.05

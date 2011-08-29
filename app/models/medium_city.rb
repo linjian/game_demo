@@ -1,7 +1,4 @@
 class MediumCity < City
-  CITY_TYPE = "MEDIUM"
-  MAXIMUM_WAITING_TRAINING_QUEUE = 5
-
   has_one :spearman,  :class_name => "Army::Spearman",
     :foreign_key  => "city_id",
     :dependent    => :destroy,
@@ -25,6 +22,8 @@ class MediumCity < City
     :class_name => "ArmyTrainingQueue",
     :dependent  => :destroy,
     :conditions => {:in_training => true}
+
+  config_class_methods :medium_city_type, :maximum_waiting_training_queue
 
   def armies
     [spearman, archer, cavalry].compact
@@ -50,8 +49,8 @@ class MediumCity < City
   end
 
   def check_waiting_queue_count
-    hit_max = (waiting_training_queues.size >= MAXIMUM_WAITING_TRAINING_QUEUE)
-    errors.add(:army_training_queue, "can only have at most #{MAXIMUM_WAITING_TRAINING_QUEUE}") if hit_max
+    hit_max = (waiting_training_queues.size >= self.class.maximum_waiting_training_queue)
+    errors.add(:army_training_queue, "can only have at most #{self.class.maximum_waiting_training_queue}") if hit_max
     !hit_max
   end
 

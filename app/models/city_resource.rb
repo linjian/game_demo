@@ -1,17 +1,4 @@
 class CityResource < ActiveRecord::Base
-  DEFAULT_POPULATION = 100
-  DEFAULT_TAX_RATE = 0.2
-
-  NORMAL_FOOD_OUTPUT  = 1000  # per hour
-  CAPITAL_FOOD_OUTPUT = 10000 # per hour
-
-  POPULATION_INCREASE_LOWER_LIMIT = 1
-  POPULATION_DECREASE_LOWER_LIMIT = 1
-  POPULATION_INCREASE_UPPER_LIMIT = 1000
-  POPULATION_DECREASE_UPPER_LIMIT = 1000
-  POPULATION_INCREASE_RATE = 0.05
-  POPULATION_DECREASE_RATE = 0.05
-
   belongs_to :user
   belongs_to :city
 
@@ -31,34 +18,15 @@ class CityResource < ActiveRecord::Base
 
   after_create :collect_tax
 
-  class << self
-    def population_increase_lower_limit
-      POPULATION_INCREASE_LOWER_LIMIT
-    end
-
-    def population_decrease_lower_limit
-      POPULATION_DECREASE_LOWER_LIMIT
-    end
-
-    def population_increase_upper_limit
-      POPULATION_INCREASE_UPPER_LIMIT
-    end
-
-    def population_decrease_upper_limit
-      POPULATION_DECREASE_UPPER_LIMIT
-    end
-
-    def population_increase_rate
-      POPULATION_INCREASE_RATE
-    end
-
-    def population_decrease_rate
-      POPULATION_DECREASE_RATE
-    end
-  end
+  config_class_methods :default_population,  :default_tax_rate, :normal_food_output,
+                       :capital_food_output, :capital_food_output,
+                       :population_increase_lower_limit, :population_decrease_lower_limit,
+                       :population_increase_upper_limit, :population_decrease_upper_limit,
+                       :population_increase_rate,        :population_decrease_rate
 
   def food_output
-    city.is_capital? ? CAPITAL_FOOD_OUTPUT : NORMAL_FOOD_OUTPUT
+    city.is_capital? ? self.class.capital_food_output :
+                       self.class.normal_food_output
   end
 
   def food_output_rate
@@ -72,8 +40,8 @@ class CityResource < ActiveRecord::Base
   def set_default_values
     self.food ||= 0
     self.gold ||= 0
-    self.population ||= 100
-    self.tax_rate ||= 0.2
+    self.population ||= self.class.default_population
+    self.tax_rate ||= self.class.default_tax_rate
   end
 
   def update_food
@@ -199,6 +167,6 @@ class CityResource < ActiveRecord::Base
   end
 
   def medium_city
-    MediumCity.find(city.id) if city.city_type == MediumCity::CITY_TYPE
+    MediumCity.find(city.id) if city.city_type == MediumCity.medium_city_type
   end
 end

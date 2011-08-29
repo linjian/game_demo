@@ -1,6 +1,4 @@
 class Army < ActiveRecord::Base
-  TURNOVER_RATE = 0.1
-
   belongs_to :user
   belongs_to :medium_city, :foreign_key => "city_id"
 
@@ -15,15 +13,19 @@ class Army < ActiveRecord::Base
 
   class << self
     def gold_cost
-      self.const_get(:GOLD_COST)
+      GameDemoConfig.get(self.class_key)["gold_cost"]
     end
 
     def training_duration
-      self.const_get(:TRAINING_DURATION)
+      GameDemoConfig.get(self.class_key)["training_duration"].minutes
     end
 
     def food_consumption
-      self.const_get(:FOOD_CONSUMPTION)
+      GameDemoConfig.get(self.class_key)["food_consumption"]
+    end
+
+    def class_key
+      self.name.demodulize.downcase.to_sym
     end
 
     def food_consumption_rate
@@ -73,6 +75,6 @@ class Army < ActiveRecord::Base
   end
 
   def remain_rate
-    1 - TURNOVER_RATE
+    1 - GameDemoConfig.get(:army_turnover_rate)
   end
 end

@@ -3,7 +3,7 @@ module Rspec
     module ArmyTrainingQueueSpecHelper
       def create_max_waiting_queues(city)
         queue_attrs = {:army_type => Army::Spearman::ARMY_TYPE, :amount => 5}
-        (MediumCity::MAXIMUM_WAITING_TRAINING_QUEUE -
+        (MediumCity.maximum_waiting_training_queue -
          city.waiting_training_queues.size).times do |i|
           city.army_training_queues.create(queue_attrs)
         end

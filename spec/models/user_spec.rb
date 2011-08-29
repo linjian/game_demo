@@ -18,11 +18,11 @@ describe User do
       }.should change(City, :count).by(1)
     end
 
-    it "should not add a city due to city count > #{User::MAXIMUM_CITY_COUNT}" do
+    it "should not add a city due to city count > #{User.maximum_city_count}" do
       create_max_cities(@user)
 
       lambda {
-        @user.add_city(:area_left_value => User::MAXIMUM_CITY_COUNT * 100, :area_bottom_value => 0).should be_false
+        @user.add_city(:area_left_value => User.maximum_city_count * 100, :area_bottom_value => 0).should be_false
       }.should_not change(City, :count)
 
       @user.errors[:city].should_not be_blank

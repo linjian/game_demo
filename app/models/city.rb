@@ -1,6 +1,4 @@
 class City < ActiveRecord::Base
-  SIDE_LENGTH = 100
-
   belongs_to :user
 
   has_one :city_resource, :dependent => :destroy
@@ -19,6 +17,8 @@ class City < ActiveRecord::Base
   delegate :change_tax_rate, :to => :city_resource
   delegate :get_population,  :to => :city_resource
 
+  config_class_methods :city_side_length
+
   def check_overlap
     errors.add(:base, "overlaped with other cities") if overlap?
   end
@@ -28,11 +28,11 @@ class City < ActiveRecord::Base
   end
 
   def area_right_value
-    area_left_value + SIDE_LENGTH - 1
+    area_left_value + self.class.city_side_length - 1
   end
 
   def area_top_value
-    area_bottom_value + SIDE_LENGTH - 1
+    area_bottom_value + self.class.city_side_length - 1
   end
 
   def sibling_cities
@@ -67,7 +67,7 @@ class City < ActiveRecord::Base
   end
 
   def become_medium_city
-    self.update_attributes(:city_type => MediumCity::CITY_TYPE)
+    self.update_attributes(:city_type => MediumCity.medium_city_type)
     MediumCity.find(self.id)
   end
 end

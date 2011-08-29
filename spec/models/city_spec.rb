@@ -123,6 +123,6 @@ describe City do
   it "should become medium city" do
     medium_city = @city.become_medium_city
     medium_city.should be_instance_of(MediumCity)
-    medium_city.city_type.should == MediumCity::CITY_TYPE
+    medium_city.city_type.should == MediumCity.medium_city_type
   end
 end

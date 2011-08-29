@@ -42,5 +42,7 @@ module GameDemo
     config.generators do |g|
       g.test_framework :rspec, :fixture => true
     end
+
+    require 'game_demo_config'
   end
 end

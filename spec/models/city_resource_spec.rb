@@ -28,8 +28,8 @@ describe CityResource do
 
         city_resource.food.should == 0
         city_resource.gold.should == 0
-        city_resource.population.should == CityResource::DEFAULT_POPULATION
-        city_resource.tax_rate.should == CityResource::DEFAULT_TAX_RATE
+        city_resource.population.should == CityResource.default_population
+        city_resource.tax_rate.should == CityResource.default_tax_rate
       }.should change(CityResource, :count).by(1)
     end
 
