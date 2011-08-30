@@ -53,13 +53,15 @@ class City < ActiveRecord::Base
   end
 
   def become_capital
-    capital_sibling = get_capital_sibling
+    old_capital_sibling = get_capital_sibling
 
-    capital_sibling.city_resource.update_food if capital_sibling
+    old_capital_sibling.mark_capital(false) if old_capital_sibling
+    self.mark_capital(true)
+  end
+
+  def mark_capital(is_capital)
     self.city_resource.update_food
-
-    capital_sibling.update_attributes(:is_capital => false) if capital_sibling
-    self.update_attributes(:is_capital => true)
+    self.update_attributes(:is_capital => is_capital)
   end
 
   def get_capital_sibling
@@ -67,7 +69,12 @@ class City < ActiveRecord::Base
   end
 
   def become_medium_city
+    return self if self.instance_of?(MediumCity) && self.is_medium_city?
     self.update_attributes(:city_type => MediumCity.medium_city_type)
     MediumCity.find(self.id)
+  end
+
+  def is_medium_city?
+    self.city_type == MediumCity.medium_city_type
   end
 end

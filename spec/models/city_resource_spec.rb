@@ -128,7 +128,7 @@ describe CityResource do
     end
 
     it "should subtract food for armies" do
-      @medium_city_resource.should_receive(:update_food).and_return(100)
+      @medium_city_resource.should_receive(:city_food).and_return(100)
       @medium_city_resource.collect_tax
 
       @medium_city_resource.food.should == 70
@@ -138,7 +138,7 @@ describe CityResource do
     end
 
     it "should encounter food crisis" do
-      @medium_city_resource.should_receive(:update_food).and_return(20)
+      @medium_city_resource.should_receive(:city_food).and_return(20)
       update_armies_amount(@medium_city, 14)
       @medium_city_resource.collect_tax
 
@@ -149,7 +149,7 @@ describe CityResource do
     end
 
     it "should decrease at least one of amount" do
-      @medium_city_resource.should_receive(:update_food).and_return(20)
+      @medium_city_resource.should_receive(:city_food).and_return(20)
       update_armies_amount(@medium_city, 5)
       @medium_city_resource.collect_tax
 
@@ -209,7 +209,7 @@ describe CityResource do
 
   it "should adjust army training queues by population" do
     medium_city_resource = city_resources(:medium_city_resource)
-    medium_city_resource.medium_city.should_not_receive(:adjust_army_training_queues_by_population)
-    medium_city_resource.medium_city.adjust_army_training_queues_by_population
+    medium_city_resource.medium_city.should_receive(:adjust_army_training_queues_by_population)
+    medium_city_resource.adjust_army_training_queues_by_population
   end
 end

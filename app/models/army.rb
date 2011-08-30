@@ -65,6 +65,7 @@ class Army < ActiveRecord::Base
   end
 
   def specialize
+    return self unless self.instance_of?(Army)
     klass = self.class.const_get(army_type.capitalize)
     klass.find(self.id)
   end

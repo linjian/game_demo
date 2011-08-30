@@ -1,4 +1,6 @@
 class CityResource < ActiveRecord::Base
+  include MediumCityResource
+
   belongs_to :user
   belongs_to :city
 
@@ -18,15 +20,14 @@ class CityResource < ActiveRecord::Base
 
   after_create :collect_tax
 
-  config_class_methods :default_population,  :default_tax_rate, :normal_food_output,
-                       :capital_food_output, :capital_food_output,
+  config_class_methods :default_population, :default_tax_rate,
+                       :normal_food_output, :capital_food_output,
                        :population_increase_lower_limit, :population_decrease_lower_limit,
                        :population_increase_upper_limit, :population_decrease_upper_limit,
                        :population_increase_rate,        :population_decrease_rate
 
   def food_output
-    city.is_capital? ? self.class.capital_food_output :
-                       self.class.normal_food_output
+    city.is_capital? ? self.class.capital_food_output : self.class.normal_food_output
   end
 
   def food_output_rate
@@ -46,10 +47,11 @@ class CityResource < ActiveRecord::Base
 
   def update_food
     now = Time.now.utc
-    food = calculate_food(now)
-    self.update_attributes(:food => food, :food_updated_time => now)
+    self.update_attributes(:food => calculate_food(now), :food_updated_time => now)
     self.food.to_i
   end
+
+  alias_method :city_food, :update_food
 
   def calculate_food(now)
     duration = now - (food_updated_time || created_at)
@@ -65,15 +67,11 @@ class CityResource < ActiveRecord::Base
     self.save
   end
 
-  def collect_tax_by_hour(save = false)
-    init_last_taxation_time
-
+  def collect_tax_by_hour
     decrease_gold_for_taxation
     calculate_population_for_taxation
     supply_food_for_armies
     self.last_taxation_time += 1.hours
-
-    self.save if save
   end
 
   def init_last_taxation_time
@@ -99,7 +97,7 @@ class CityResource < ActiveRecord::Base
 
   [:increase, :decrease].each do |type|
     define_method :"#{type}_population_for_taxation" do
-      delta = (self.population * self.class.send(:"population_#{type}_rate"))
+      delta = self.population * self.class.send(:"population_#{type}_rate")
       delta = [delta, self.class.send(:"population_#{type}_lower_limit")].max
       delta = [delta, self.class.send(:"population_#{type}_upper_limit")].min
       self.population = self.send(:"#{type}d_population", delta).to_i
@@ -131,42 +129,16 @@ class CityResource < ActiveRecord::Base
   end
 
   def get_gold
-    with_tax_collection do
-      self.gold
-    end
+    with_tax_collection { self.gold }
   end
 
   def get_population
-    with_tax_collection do
-      self.population
-    end
+    with_tax_collection { self.population }
   end
 
   def change_tax_rate(new_rate)
     with_tax_collection do
       self.update_attributes(:tax_rate => new_rate) && new_rate
     end
-  end
-
-  def adjust_army_training_queues_by_population
-    medium_city = self.medium_city
-    medium_city.adjust_army_training_queues_by_population if medium_city
-  end
-
-  def supply_food_for_armies
-    return unless medium_city = self.medium_city
-
-    city_food = self.update_food
-    armies_food_consumption = medium_city.armies_food_consumption
-
-    delta = city_food - armies_food_consumption
-    self.update_attribute(:food, [delta, 0].max)
-    medium_city.decreased_armies_amount if delta < 0
-
-    medium_city.clean_food_consumption
-  end
-
-  def medium_city
-    MediumCity.find(city.id) if city.city_type == MediumCity.medium_city_type
   end
 end

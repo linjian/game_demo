@@ -1,16 +1,9 @@
 class MediumCity < City
-  has_one :spearman,  :class_name => "Army::Spearman",
-    :foreign_key  => "city_id",
-    :dependent    => :destroy,
-    :conditions   => {:army_type => Army::Spearman::ARMY_TYPE}
-  has_one :archer,    :class_name => "Army::Archer",
-    :foreign_key  => "city_id",
-    :dependent    => :destroy,
-    :conditions   => {:army_type => Army::Archer::ARMY_TYPE}
-  has_one :cavalry,   :class_name => "Army::Cavalry",
-    :foreign_key  => "city_id",
-    :dependent    => :destroy,
-    :conditions   => {:army_type => Army::Cavalry::ARMY_TYPE}
+  extend ArmyAssociations::City
+
+  has_one_army :spearman
+  has_one_army :archer
+  has_one_army :cavalry
 
   has_many :army_training_queues,     :foreign_key => "city_id",
     :dependent  => :destroy
@@ -30,15 +23,16 @@ class MediumCity < City
   end
 
   def armies_food_consumption
-    armies.inject(0) {|sum, army| sum + army.get_food}
+    armies.sum(&:get_food)
   end
 
   def clean_food_consumption
-    armies.each {|army| army.update_attribute(:food, 0)}
+    armies.each {|army| army.update_attributes(:food => 0)}
   end
 
-  def decreased_armies_amount
-    armies.each {|army| army.update_attribute(:amount, army.amount * army.remain_rate)}
+  def decrease_armies_amount_for_food
+    # not trigger callback :set_food
+    armies.each {|army| army.update_attribute(:amount, (army.amount * army.remain_rate).to_i)}
   end
 
   def add_army_training_queue(queue_attrs)
@@ -55,9 +49,7 @@ class MediumCity < City
   end
 
   def waiting_training_population
-    waiting_training_queues.inject(0) do |sum, queue|
-      sum + queue.amount
-    end
+    waiting_training_queues.to_a.sum(&:amount)
   end
 
   def cancel_army_training_queue(queue)
@@ -106,20 +98,29 @@ class MediumCity < City
     return if army_training_queues.empty?
 
     army_training_queues.first.into_training(nil)
-
     [army_training_queues, nil].flatten.each_cons(2) do |queue, next_queue|
       queue.in_training? ? queue.finish_training(next_queue) : break
     end
   end
 
   def adjust_army_training_queues_by_population
-    population = city_resource.population
+    mark_training_queues_by_population(city_resource.population)
+    clean_training_queues_by_population
+  end
+
+  def mark_training_queues_by_population(population)
     waiting_training_queues.each do |queue|
-      if population > queue.amount
-        population -= queue.amount
-      elsif population > 0
-        queue.update_attribute(:amount, population)
-        population = 0
+      population -= queue.amount
+      queue.amount += population if population < 0
+    end
+  end
+
+  def clean_training_queues_by_population
+    waiting_training_queues.each do |queue|
+      next unless queue.amount_changed?
+      if queue.amount > 0
+        # not trigger callback :set_food
+        queue.update_attribute(:amount, queue.amount)
       else
         queue.destroy
       end

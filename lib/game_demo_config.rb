@@ -17,14 +17,19 @@ module GameDemoConfig
       eigenclass = class << self
         self
       end
+      class_name = self.name
 
       eigenclass.instance_eval do
         args.each do |method|
           method = method.to_sym
-          define_method method do
-            GameDemoConfig.get(method)
+          if method_defined?(method)
+            $stderr.puts "WARNING: Possible conflict: #{class_name}.#{method} already exists"
+          else
+            define_method method do
+              GameDemoConfig.get(method)
+            end
           end
-        end
+        end # of each
       end
     end
 
