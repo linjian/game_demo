@@ -129,7 +129,6 @@ describe MediumCity do
     it "no waiting training info" do
       clean_waiting_queuqs(@medium_city)
       @medium_city.reload
-
       @medium_city.waiting_training_info.should be_empty
     end
   end

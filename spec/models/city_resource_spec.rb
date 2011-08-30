@@ -21,30 +21,32 @@ describe CityResource do
     end
 
     it "should set default values" do
-      lambda {
-        city_resource = @city.city_resource.build
-        city_resource.stub(:collect_tax)
-        city_resource.save
+      city_resource = @city.city_resource.build
+      city_resource.stub(:collect_tax)
 
-        city_resource.food.should == 0
-        city_resource.gold.should == 0
-        city_resource.population.should == CityResource.default_population
-        city_resource.tax_rate.should == CityResource.default_tax_rate
+      lambda {
+        city_resource.save
       }.should change(CityResource, :count).by(1)
+
+      city_resource.food.should == 0
+      city_resource.gold.should == 0
+      city_resource.population.should == CityResource.default_population
+      city_resource.tax_rate.should == CityResource.default_tax_rate
     end
 
     it "should not replace by default values" do
       attrs = {:food => 10, :gold => 20, :population => 30, :tax_rate => 0.4}
-      lambda {
-        city_resource = @city.city_resource.build(attrs)
-        city_resource.stub(:collect_tax)
-        city_resource.save
+      city_resource = @city.city_resource.build(attrs)
+      city_resource.stub(:collect_tax)
 
-        city_resource.food.should == attrs[:food]
-        city_resource.gold.should == attrs[:gold]
-        city_resource.population.should == attrs[:population]
-        city_resource.tax_rate.should == attrs[:tax_rate]
+      lambda {
+        city_resource.save
       }.should change(CityResource, :count).by(1)
+
+      city_resource.food.should == attrs[:food]
+      city_resource.gold.should == attrs[:gold]
+      city_resource.population.should == attrs[:population]
+      city_resource.tax_rate.should == attrs[:tax_rate]
     end
   end
 
@@ -112,7 +114,6 @@ describe CityResource do
 
     it "should decrease population at most by #{CityResource.population_decrease_upper_limit}" do
       @city_resource.should_receive(:adjust_army_training_queues_by_population)
-
       @city_resource.population = 30000
       Timecop.freeze(@one_hour_later) { @city_resource.collect_tax }
 

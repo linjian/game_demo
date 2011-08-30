@@ -108,7 +108,6 @@ describe City do
 
     it "should update food before old capital change to be normal city" do
       created_at = @city.city_resource.created_at
-
       old_capital = create_capital(@user)
       old_capital.city_resource.update_attributes(:food_updated_time => created_at)
 

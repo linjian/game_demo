@@ -3,7 +3,8 @@ module Rspec
     module CitySpecHelper
       def create_max_cities(user)
         (User.maximum_city_count - user.cities.size).times do |i|
-          user.cities.create(:area_left_value => i * City.city_side_length, :area_bottom_value => 0)
+          user.cities.create(:area_left_value => i * City.city_side_length,
+                             :area_bottom_value => 0)
         end
       end
 
