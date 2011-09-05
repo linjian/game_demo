@@ -19,7 +19,7 @@ module GameDemoConfig
       end
       class_name = self.name
 
-      eigenclass.instance_eval do
+      eigenclass.class_eval do
         args.each do |method|
           method = method.to_sym
           if method_defined?(method)
