@@ -1,12 +1,10 @@
 require 'spec_helper'
 
 describe Army do
-  fixtures :armies
-
   before(:each) do
-    @spearman = armies(:spearman).specialize
-    @archer = armies(:archer).specialize
-    @cavalry = armies(:cavalry).specialize
+    @spearman = army_spearmen(:spearman)
+    @archer   = army_archers(:archer)
+    @cavalry  = army_cavalries(:cavalry)
   end
 
   it "should belongs to a medium city" do
@@ -15,15 +13,15 @@ describe Army do
 
   context "specialize" do
     it "should be spearman" do
-      @spearman.should be_instance_of(Army::Spearman)
+      Army.find(@spearman).specialize.should be_instance_of(Army::Spearman)
     end
 
     it "should be archer" do
-      @archer.specialize.should be_instance_of(Army::Archer)
+      Army.find(@archer).specialize.should be_instance_of(Army::Archer)
     end
 
     it "should be cavalry" do
-      @cavalry.specialize.should be_instance_of(Army::Cavalry)
+      Army.find(@cavalry).specialize.should be_instance_of(Army::Cavalry)
     end
   end
 

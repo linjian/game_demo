@@ -3,8 +3,6 @@ require 'spec_helper'
 describe City do
   include Rspec::GameDemo::CitySpecHelper
 
-  fixtures :cities
-
   before(:each) do
     @city = cities(:city_1)
     @user = @city.user

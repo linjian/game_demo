@@ -3,11 +3,8 @@ require 'spec_helper'
 describe ArmyTrainingQueue do
   include Rspec::GameDemo::ArmyTrainingQueueSpecHelper
 
-  fixtures :cities
-  fixtures :army_training_queues
-
   before(:each) do
-    @medium_city = cities(:medium_city).become_medium_city
+    @medium_city = medium_cities(:medium_city)
     @in_training_queue = create_in_training_queue(@medium_city)
     @waiting_queue = create_waiting_queue(@medium_city)
     @now = @in_training_queue.start_training_time + 1.minutes

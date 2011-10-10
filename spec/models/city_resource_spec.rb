@@ -4,12 +4,9 @@ describe CityResource do
   include Rspec::GameDemo::CitySpecHelper
   include Rspec::GameDemo::CityResourceSpecHelper
 
-  fixtures :cities
-  fixtures :city_resources
-
   before(:each) do
     @city = cities(:city_1)
-    @city_resource = city_resources(:city_resource_1)
+    @city_resource = CityResource.find(@city.city_resource.id)
   end
 
   context "create" do
@@ -123,8 +120,10 @@ describe CityResource do
 
   context "supply food while collecting tax" do
     before(:each) do
-      @medium_city_resource = city_resources(:medium_city_resource)
-      @medium_city = @medium_city_resource.medium_city
+      @medium_city = medium_cities(:medium_city)
+      @medium_city_resource = CityResource.find(@medium_city.city_resource.id)
+      @medium_city_resource.update_attributes(:last_taxation_time => nil)
+
       update_armies_food(@medium_city, 10)
     end
 
@@ -209,7 +208,7 @@ describe CityResource do
   end
 
   it "should adjust army training queues by population" do
-    medium_city_resource = city_resources(:medium_city_resource)
+    medium_city_resource = medium_cities(:medium_city).city_resource
     medium_city_resource.medium_city.should_receive(:adjust_army_training_queues_by_population)
     medium_city_resource.adjust_army_training_queues_by_population
   end

@@ -3,9 +3,6 @@ require 'spec_helper'
 describe User do
   include Rspec::GameDemo::CitySpecHelper
 
-  fixtures :users
-  fixtures :city_resources
-
   before(:each) do
     @user = users(:user_1)
   end

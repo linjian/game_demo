@@ -3,11 +3,8 @@ require 'spec_helper'
 describe MediumCity do
   include Rspec::GameDemo::ArmyTrainingQueueSpecHelper
 
-  fixtures :cities
-  fixtures :army_training_queues
-
   before(:each) do
-    @medium_city = cities(:medium_city).become_medium_city
+    @medium_city = medium_cities(:medium_city)
   end
 
   context "has armies" do
