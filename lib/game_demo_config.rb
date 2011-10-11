@@ -6,7 +6,7 @@ module GameDemoConfig
 
     def config
       @game_demo_config = nil if Rails.env.development?
-      @game_demo_config ||= YAML.load(File.read(config_file)).symbolize_keys
+      @game_demo_config ||= YAML.load(File.read(config_file))[Rails.env].symbolize_keys
     end
 
     private
