@@ -5,9 +5,14 @@ module GameDemoConfig
     end
 
     def config
-      @game_demo_config = nil if ENV["RAILS_ENV"] == "development"
-      config_file = File.join(Rails.root, "config/game_demo_config.yml")
+      @game_demo_config = nil if Rails.env.development?
       @game_demo_config ||= YAML.load(File.read(config_file)).symbolize_keys
+    end
+
+    private
+
+    def config_file
+      @config_file ||= File.join(Rails.root, "config/game_demo_config.yml")
     end
   end
 
