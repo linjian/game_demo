@@ -23,7 +23,12 @@ module Rspec
       end
 
       def queue_attrs
-        queue_attrs = {:army_type => Army::Spearman::ARMY_TYPE, :amount => 5}
+        {:army_type => Army::Spearman::ARMY_TYPE, :amount => 5}
+      end
+
+      def get_training_time(*training_queues)
+        delta = training_queues.last.is_a?(ActiveSupport::Duration) ? training_queues.pop : 2.minutes
+        training_queues.first.start_training_time + training_queues.sum(&:total_training_duration) + delta
       end
     end
   end

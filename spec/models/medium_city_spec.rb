@@ -164,7 +164,7 @@ describe MediumCity do
 
       it "one queue is finished training and no more queue" do
         in_training_queue = create_in_training_queue(@medium_city)
-        now = in_training_queue.start_training_time + 100.hours
+        now = get_training_time(in_training_queue)
         old_amount = @medium_city.spearman.amount
         @medium_city.city_resource.update_attributes(:gold => 20)
 
@@ -193,7 +193,7 @@ describe MediumCity do
       end
 
       it "one queue is finished training and one more queue will be in training" do
-        now = @in_training_queue.start_training_time + 20.minutes
+        now = get_training_time(@in_training_queue)
         Timecop.freeze(now) do
           lambda {
             @medium_city.do_training
@@ -204,7 +204,7 @@ describe MediumCity do
       end
 
       it "two queues are all finished training" do
-        now = @in_training_queue.start_training_time + 100.hours
+        now = get_training_time(@in_training_queue, @waiting_queue)
         Timecop.freeze(now) do
           lambda {
             @medium_city.do_training
@@ -221,7 +221,7 @@ describe MediumCity do
       end
 
       it "one queue is finished training and two more queues will be in training" do
-        now = @in_training_queue.start_training_time + 19.minutes
+        now = get_training_time(@in_training_queue)
         Timecop.freeze(now) do
           lambda {
             @medium_city.do_training
@@ -233,7 +233,7 @@ describe MediumCity do
       end
 
       it "two queues are all finished training and one more queues will be in training" do
-        now = @in_training_queue.start_training_time + 37.minutes
+        now = get_training_time(@in_training_queue, @waiting_queue_1)
         Timecop.freeze(now) do
           lambda {
             @medium_city.do_training
@@ -247,7 +247,7 @@ describe MediumCity do
     it "should create army if not exists" do
       @medium_city.spearman.destroy
       in_training_queue = create_in_training_queue(@medium_city)
-      now = in_training_queue.start_training_time + 100.hours
+      now = get_training_time(in_training_queue)
 
       Timecop.freeze(now) do
         lambda {
