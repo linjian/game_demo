@@ -4,16 +4,16 @@ class CityResource < ActiveRecord::Base
   belongs_to :user
   belongs_to :city
 
-  validates_numericality_of :food,
-    :greater_than_or_equal_to => 0
-  validates_numericality_of :gold,
-    :only_integer             => true,
-    :greater_than_or_equal_to => 0
-  validates_numericality_of :population,
-    :only_integer             => true,
-    :greater_than_or_equal_to => 0
-  validates_numericality_of :tax_rate,
-    :greater_than_or_equal_to => 0
+  validates :food,
+    :numericality => {:greater_than_or_equal_to => 0}
+  validates :gold,
+    :numericality => {:greater_than_or_equal_to => 0,
+                      :only_integer             => true}
+  validates :population,
+    :numericality => {:greater_than_or_equal_to => 0,
+                      :only_integer             => true}
+  validates :tax_rate,
+    :numericality => {:greater_than_or_equal_to => 0}
 
   before_create :set_user_id
   before_create :set_default_values

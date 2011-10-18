@@ -3,12 +3,12 @@ class City < ActiveRecord::Base
 
   has_one :city_resource, :dependent => :destroy
 
-  validates_numericality_of :area_left_value,
-    :only_integer             => true,
-    :greater_than_or_equal_to => 0
-  validates_numericality_of :area_bottom_value,
-    :only_integer             => true,
-    :greater_than_or_equal_to => 0
+  validates :area_left_value,
+    :numericality => {:greater_than_or_equal_to => 0,
+                      :only_integer             => true}
+  validates :area_bottom_value,
+    :numericality => {:greater_than_or_equal_to => 0,
+                      :only_integer             => true}
 
   validate :check_overlap
 

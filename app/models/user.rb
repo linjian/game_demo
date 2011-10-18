@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
     :foreign_key => "user_id",
     :conditions  => {:city_type => MediumCity.medium_city_type}
 
-  validates_presence_of :login, :password
+  validates :login, :password, :presence => true
 
   config_class_methods :maximum_city_count
 

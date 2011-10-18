@@ -2,11 +2,11 @@ class Army < ActiveRecord::Base
   belongs_to :user
   belongs_to :medium_city, :foreign_key => "city_id"
 
-  validates_numericality_of :food,
-    :greater_than_or_equal_to => 0
-  validates_numericality_of :amount,
-    :only_integer             => true,
-    :greater_than_or_equal_to => 0
+  validates :food,
+    :numericality => {:greater_than_or_equal_to => 0}
+  validates :amount,
+    :numericality => {:greater_than_or_equal_to => 0,
+                      :only_integer             => true}
 
   before_create :set_army_type, :set_user_id
   before_save :set_food
