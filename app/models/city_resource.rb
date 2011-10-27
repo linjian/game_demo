@@ -4,6 +4,7 @@ class CityResource < ActiveRecord::Base
   belongs_to :user
   belongs_to :city
 
+  validates_presence_of :city_id, :user_id
   validates :food,
     :numericality => {:greater_than_or_equal_to => 0}
   validates :gold,
@@ -15,7 +16,8 @@ class CityResource < ActiveRecord::Base
   validates :tax_rate,
     :numericality => {:greater_than_or_equal_to => 0}
 
-  before_create :set_user_id
+  before_validation :set_user_id
+
   before_create :set_default_values
 
   after_create :collect_tax

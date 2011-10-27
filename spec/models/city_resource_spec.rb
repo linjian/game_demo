@@ -12,13 +12,13 @@ describe CityResource do
   context "create" do
     it "should set user id" do
       lambda {
-        city_resource = @city.city_resource.create(:user_id => 1234)
+        city_resource = CityResource.create(:city_id => @city)
         city_resource.user.should == @city.user
       }.should change(CityResource, :count).by(1)
     end
 
     it "should set default values" do
-      city_resource = @city.city_resource.build
+      city_resource = CityResource.new(:city_id => @city)
       city_resource.stub(:collect_tax)
 
       lambda {
@@ -32,8 +32,8 @@ describe CityResource do
     end
 
     it "should not replace by default values" do
-      attrs = {:food => 10, :gold => 20, :population => 30, :tax_rate => 0.4}
-      city_resource = @city.city_resource.build(attrs)
+      attrs = {:food => 10, :gold => 20, :population => 30, :tax_rate => 0.4, :city_id => @city}
+      city_resource = CityResource.new(attrs)
       city_resource.stub(:collect_tax)
 
       lambda {
@@ -67,7 +67,7 @@ describe CityResource do
     end
 
     it "should collect tax when create a city" do
-      @city.city_resource.create.population.should == 105
+      @city.city_resource.population.should == 105
     end
 
     it "less than 1 hour since last taxation" do

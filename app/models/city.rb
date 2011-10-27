@@ -3,10 +3,13 @@ class City < ActiveRecord::Base
 
   has_one :city_resource, :dependent => :destroy
 
+  validates_presence_of :user_id
   validates :area_left_value,
+    :presence     => true,
     :numericality => {:greater_than_or_equal_to => 0,
                       :only_integer             => true}
   validates :area_bottom_value,
+    :presence     => true,
     :numericality => {:greater_than_or_equal_to => 0,
                       :only_integer             => true}
 

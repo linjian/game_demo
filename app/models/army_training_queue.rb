@@ -2,13 +2,14 @@ class ArmyTrainingQueue < ActiveRecord::Base
   belongs_to :user
   belongs_to :medium_city, :foreign_key => "city_id"
 
+  validates_presence_of :city_id, :user_id, :army_type
   validates :amount,
     :numericality => {:greater_than => 0,
                       :only_integer => true}
 
   validate :check_population
 
-  before_create :set_user_id
+  before_validation :set_user_id
 
   def check_population
     errors.add(:base, "not enough population") if not_enough_population?
